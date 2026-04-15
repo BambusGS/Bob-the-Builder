@@ -2,6 +2,7 @@ from os.path import join
 import sys
 
 import numpy as np
+from numba import njit
 
 
 def load_data(load_dir, bid):
@@ -12,19 +13,28 @@ def load_data(load_dir, bid):
     return u, interior_mask
 
 
+@njit
 def jacobi(u, interior_mask, max_iter, atol=1e-6):
-    u = np.copy(u)
+    u_curr = u.copy()
+    u_next = u.copy()
+    rows, cols = u_curr.shape
 
     for i in range(max_iter):
-        # Compute average of left, right, up and down neighbors, see eq. (1)
-        u_new = 0.25 * (u[1:-1, :-2] + u[1:-1, 2:] + u[:-2, 1:-1] + u[2:, 1:-1])
-        u_new_interior = u_new[interior_mask]
-        delta = np.abs(u[1:-1, 1:-1][interior_mask] - u_new_interior).max()
-        u[1:-1, 1:-1][interior_mask] = u_new_interior
+        delta = 0.0
+        for r in range(1, rows - 1):
+            for c in range(1, cols - 1):
+                if interior_mask[r-1, c-1]:
+                    val = 0.25 * (u_curr[r, c-1] + u_curr[r, c+1] + u_curr[r-1, c] + u_curr[r+1, c])
+                    u_next[r, c] = val
+                    diff = abs(val - u_curr[r, c])
+                    if diff > delta:
+                        delta = diff
+
+        u_curr, u_next = u_next, u_curr
 
         if delta < atol:
             break
-    return u
+    return u_curr
 
 
 def summary_stats(u, interior_mask):
