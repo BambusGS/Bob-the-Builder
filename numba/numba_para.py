@@ -1,4 +1,6 @@
 import sys
+from itertools import repeat
+from multiprocessing.pool import Pool
 from os.path import join
 
 import numpy as np
@@ -65,14 +67,14 @@ if __name__ == "__main__":
         building_ids = f.read().splitlines()
 
     if len(sys.argv) < 2:
-        N = 1
+        n = 1
     else:
-        N = int(sys.argv[1])
-    building_ids = building_ids[:N]
+        n = int(sys.argv[1])
+    building_ids = building_ids[:n]
 
     # Load floor plans
-    all_u0 = np.empty((N, 514, 514))
-    all_interior_mask = np.empty((N, 512, 512), dtype="bool")
+    all_u0 = np.empty((n, 514, 514))
+    all_interior_mask = np.empty((n, 512, 512), dtype="bool")
     for i, bid in enumerate(building_ids):
         u0, interior_mask = load_data(LOAD_DIR, bid)
         all_u0[i] = u0
@@ -82,11 +84,16 @@ if __name__ == "__main__":
     MAX_ITER = 20_000
     ABS_TOL = 1e-4
 
-    all_u = np.empty_like(all_u0)
-    for i, (u0, interior_mask) in enumerate(zip(all_u0, all_interior_mask)):
-        u = jacobi(u0, interior_mask, MAX_ITER, ABS_TOL)
-        print(f"Building {building_ids[i]}: iterations={MAX_ITER}")
-        all_u[i] = u
+    with Pool(16) as pool:
+        all_u = pool.starmap(
+            jacobi,
+            zip(
+                all_u0,
+                all_interior_mask,
+                repeat(MAX_ITER),
+                repeat(ABS_TOL),
+            ),
+        )
 
     # Print summary statistics in CSV format
     stat_keys = ["mean_temp", "std_temp", "pct_above_18", "pct_below_15"]
