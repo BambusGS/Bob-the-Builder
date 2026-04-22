@@ -50,7 +50,7 @@ def bar_plot_all(df:pd.DataFrame):
 
 
 
-df = analyse_all()
+#df = analyse_all()
 #bar_plot_all(df)
 
 
@@ -78,30 +78,15 @@ def get_system_info():
     else:
         info["CPU"] = uname.processor
     info['machine'] = uname.machine
-
     info['p_cores'] = psutil.cpu_count(logical=False)
     info['t_cores'] = psutil.cpu_count(logical=True)
-
-
-    # CPU cache (approximate via psutil if available)
-    try:
-        cpu_freq = psutil.cpu_freq()
-        info["CPU Frequency"] = f"{cpu_freq.current:.2f} MHz"
-    except:
-        info["CPU Frequency"] = "Unknown"
-
-
     # Format into string
     result = (
         f"OS:{info['OS']},"
         f'node:{info['node']},'
         f'machine:{info['machine']},'
-        f"CPU: {info['CPU']}, "
-        f'p_threads: {info['p_cores']},'
-        f't_threads: {info['t_cores']}'
+        f"CPU:{info['CPU']},"
+        f'p_threads:{info['p_cores']},'
+        f't_threads:{info['t_cores']}'
         )
-
     return result
-
-
-print(get_system_info())
