@@ -113,7 +113,7 @@ visualise the heat
 
 
 
-analesys schema:
+analysis schema:
 the first jacobi run each iteration time is measured and saved
 
 on all subsequent runs:
@@ -127,7 +127,7 @@ total memory usage (optional)
 total diskspace produced for data (optional)
 
 
-data analesys:
+data analysis:
 plot time per iteration over iterations
 plot sim time over number of iterations
 compute mean sim time between scripts
