@@ -14,14 +14,5 @@ source /dtu/projects/02613_2025/conda/conda_init.sh
 conda activate 02613_2026
 echo "Hello from numba"
 
-time python3 -u numba.py 1
-time python3 -u numba.py 1
-time python3 -u numba.py 1
-time python3 -u numba.py 1
-time python3 -u numba.py 1
-time python3 -u numba.py 1
-time python3 -u numba.py 1
-time python3 -u numba.py 1
-time python3 -u numba.py 1
-time python3 -u numba.py 1
+time python3 -u numba.py 20
 
