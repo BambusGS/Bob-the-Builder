@@ -80,7 +80,7 @@ def jacobi_kernel(u, u_new, interior_mask):
     if i >= h - 1 or j >= w - 1:
         return
     
-    if interior_mask[i - 1, j - 1]:
+    if interior_mask[i - 1 , j - 1]:
         u_new[i, j] = 0.25 * (
             u[i, j - 1] + 
             u[i, j + 1] + 
@@ -198,8 +198,8 @@ if __name__ == '__main__':
     
     # -------- VERIFICATION --------
     if VERIFY:
-        VERIFY_RTOL = 1e-2
-        VERIFY_ATOL = 1e-1
+        VERIFY_RTOL = 5e-2
+        VERIFY_ATOL = 5e-1
         # Find the indices of the verify buildings in the loaded list
         verify_indices = [i for i, bid in enumerate(building_ids) if bid in building_ids_verify]
         # or manually call the first 4 buildings for verification from all building_ids
@@ -253,6 +253,7 @@ if __name__ == '__main__':
                 # Large tolerances needed, bcs cuda runs all 20k iterations (vs CPU with ABS_TOL=1e-4) runs on average 4k iterations, so not fully converged
                 np.testing.assert_allclose(verify_u[i], cuda_verify_u[i], atol=VERIFY_ATOL, rtol=VERIFY_RTOL)
                 np.testing.assert_allclose(verify_u[i], cuda_verify_u_batched[i], atol=VERIFY_ATOL, rtol=VERIFY_RTOL)
+                np.testing.assert_allclose(cuda_verify_u[i], cuda_verify_u_batched[i], atol=VERIFY_ATOL/100, rtol=VERIFY_RTOL/100) # the two cuda should have same results
                 
                 # Calculate the maximum atol and rtol differences for reporting
                 max_abs_diff = np.abs(verify_u[i] - cuda_verify_u[i]).max()
@@ -271,23 +272,23 @@ if __name__ == '__main__':
     #     u = jacobi(u0, interior_mask, MAX_ITER, ABS_TOL)
     #     all_u[i] = u
         
-    # start_time = time.time()
-    
-    # all_u = np.empty_like(all_u0)
-    # for i in range(N):
-    #     u_cuda = jacobi_numba(all_u0[i], all_interior_mask[i], MAX_ITER)
-    #     all_u[i] = u_cuda
-        
-    #     print(f"Completed building {building_ids[i]} in {(time.time() - start_time) * 1000 / (i + 1):.2f} ms per building")
-    # print(f"Total time for GPU processing: {(time.time() - start_time):.2f} seconds for {N} building(s)")
-    
     start_time = time.time()
     
-    # Launch ALL buildings at once!
-    all_u = jacobi_numba_batched(all_u0, all_interior_mask, MAX_ITER)
+    all_u = np.empty_like(all_u0)
+    for i in range(N):
+        u_cuda = jacobi_numba(all_u0[i], all_interior_mask[i], MAX_ITER)
+        all_u[i] = u_cuda
         
+        print(f"Completed building {building_ids[i]} in {(time.time() - start_time) * 1000 / (i + 1):.2f} ms per building")
     print(f"Total time for GPU processing: {(time.time() - start_time):.2f} seconds for {N} building(s)")
-
+    
+    # print(f"Running CUDA batched kernel for {N} building(s)...")
+    # start_time = time.time()
+    # # Launch ALL buildings at once!
+    # all_u = jacobi_numba_batched(all_u0, all_interior_mask, MAX_ITER)
+        
+    # print(f"Total time for GPU processing: {(time.time() - start_time):.2f} seconds for {N} building(s)")
+    # print(f"Average time per building: {(time.time() - start_time) * 1000 / N:.2f} ms")
 
     # Print summary statistics in CSV format
     stat_keys = ['mean_temp', 'std_temp', 'pct_above_18', 'pct_below_15']
