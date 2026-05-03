@@ -1,0 +1,38 @@
+Running verification using CPU classical method for 4 building(s)...
+Converged after 3601 iterations with max delta 1.00e-04
+Converged after 3530 iterations with max delta 9.99e-05
+Converged after 14267 iterations with max delta 1.00e-04
+Converged after 4200 iterations with max delta 9.99e-05
+CPU verification completed at 9096.95 ms per building
+Running CUDA kernels for 4 building(s)...
+CUDA verification completed at 1017.50 ms per building
+Running CUDA batched kernel for 4 building(s)...
+CUDA batched verification completed at 301.12 ms per building
+Saved visualization to /buildings_CPU_verify.png
+Saved visualization to /buildings_CUDA_verify.png
+Saved visualization to /buildings_CUDA_batched_verify.png
+Verifying CUDA results against CPU results...
+Building ID 10000: max abs diff = 5.24e-02, max rel diff = 2.10e-03
+Building ID 10000 (batched): max abs diff = 5.24e-02, max rel diff = 2.10e-03
+Building ID 10334: max abs diff = 5.75e-02, max rel diff = 2.30e-03
+Building ID 10334 (batched): max abs diff = 5.75e-02, max rel diff = 2.30e-03
+Building ID 10786: max abs diff = 2.72e-01, max rel diff = 1.09e-02
+Building ID 10786 (batched): max abs diff = 2.72e-01, max rel diff = 1.09e-02
+Building ID 11117: max abs diff = 6.85e-02, max rel diff = 2.74e-03
+Building ID 11117 (batched): max abs diff = 6.85e-02, max rel diff = 2.74e-03
+Verification passed successfully!
+
+Resource usage summary:
+
+    CPU time :                                   1296.63 sec.
+    Max Memory :                                 16276 MB
+    Average Memory :                             10763.60 MB
+    Total Requested Memory :                     16276.00 MB
+    Delta Memory :                               0.00 MB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                10
+    Run time :                                   1343 sec.
+    Turnaround time :                            1345 sec.
+
+The output (if any) is above this job summary.
